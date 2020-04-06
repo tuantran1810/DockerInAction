@@ -1,0 +1,4 @@
+FROM dockerinaction/ch8-onbuild
+RUN touch /app/downstream-evidence
+RUN ls -al .
+

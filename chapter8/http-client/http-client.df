@@ -1,0 +1,13 @@
+FROM golang:1-alpine as builder
+RUN apk update && apk add ca-certificates
+ENV HTTP_CLIENT_SRC=$GOPATH/src/dia/http-client/
+COPY . $HTTP_CLIENT_SRC
+WORKDIR $HTTP_CLIENT_SRC
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o /go/bin/http-client
+
+FROM scratch as runtime
+ENV PATH="/bin"
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /go/bin/http-client /http-client
+ENTRYPOINT ["/http-client"]
+
